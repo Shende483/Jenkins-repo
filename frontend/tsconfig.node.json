@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "CommonJS", // Use CommonJS for Node.js
+    "outDir": "./dist-node" // Output directory for Node.js files
+  },
+  "include": ["vite.config.ts"] // Include Vite configuration file
+}
+  

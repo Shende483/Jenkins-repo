@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend  # Path to your backend Dockerfile directory
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "3040:3040"  # Expose backend port
+    networks:
+      - app_network
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend  # Path to your frontend Dockerfile directory
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3030:80"  # Frontend exposed on port 3030 (Nginx listens on port 80)
+    networks:
+      - app_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  app_network:
+    driver: bridge
+
