@@ -1,0 +1,27 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: 54.225.30.217
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/frontend
+            git pull origin main
+            yarn install  # (Agar yarn use kar rahe ho, nahi toh npm install likho)
+            yarn build    # (Agar vite use kar rahe ho, nahi toh npm run build likho)
+            pm2 restart frontend
