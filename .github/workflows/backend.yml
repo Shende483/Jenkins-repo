@@ -1,0 +1,44 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - main  # Branch jo deploy hoga
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Install Dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Build NestJS App
+      run: |
+        cd backend
+        npm run build
+
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        scp -i private_key.pem -r backend/dist backend/package.json backend/node_modules $USER@$HOST:/home/$USER/backend/
+        ssh -i private_key.pem $USER@$HOST << 'EOF'
+          cd /home/$USER/backend
+          pm2 restart backend || pm2 start dist/main.js --name backend
+        EOF
+
