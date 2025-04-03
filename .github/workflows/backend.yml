@@ -35,7 +35,7 @@ jobs:
         USER: ${{ secrets.EC2_USER }}
       run: |
         echo "$PRIVATE_KEY" > private_key.pem
-        chmod 600 private_key.pem
+        chmod 400 private_key.pem
         scp -i private_key.pem -r backend/dist backend/package.json backend/node_modules $USER@$HOST:/home/$USER/backend/
         ssh -i private_key.pem $USER@$HOST << 'EOF'
           cd /home/$USER/backend
